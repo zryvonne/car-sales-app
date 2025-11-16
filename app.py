@@ -2,12 +2,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import xgboost as xgb
 import numpy as np
+from fastapi.responses import FileResponse
 
 app = FastAPI()
-
-@app.get("/")
-def home():
-    return {"message": "API is running!"}
 
 app.add_middleware(
     CORSMiddleware,
@@ -20,6 +17,12 @@ app.add_middleware(
 booster = xgb.Booster()
 booster.load_model("model/model.json")
 
+# Serve frontend
+@app.get("/")
+def serve_frontend():
+    return FileResponse("frontend/index.html")
+
+# Prediction endpoint
 @app.get("/predict")
 def predict(s1: float, s2: float, s3: float, s4: float, s5: float, s6: float):
     X = np.array([[s1, s2, s3, s4, s5, s6]])
