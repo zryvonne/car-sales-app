@@ -22,10 +22,19 @@ booster.load_model("model/model.json")
 def serve_frontend():
     return FileResponse("frontend/index.html")
 
-# Prediction endpoint
 @app.get("/predict")
 def predict(s1: float, s2: float, s3: float, s4: float, s5: float, s6: float):
-    X = np.array([[s1, s2, s3, s4, s5, s6]])
-    dmat = xgb.DMatrix(X)
+    import pandas as pd
+
+    # Create a DataFrame with correct column names
+    df = pd.DataFrame(
+        [[s1, s2, s3, s4, s5, s6]],
+        columns=["lag_1", "lag_2", "lag_3", "lag_4", "lag_5", "lag_6"]
+    )
+
+    # Convert to DMatrix
+    dmat = xgb.DMatrix(df)
+
+    # Make prediction
     pred = booster.predict(dmat)
     return {"prediction": float(pred[0])}
